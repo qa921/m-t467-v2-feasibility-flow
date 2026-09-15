@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { evaluate, applyScenarioDelta } from './engine.js';
 import { annualPctToMonthlyRate, irrMonthly, npv } from './metrics.js';
 import { buildMonthlyCashflow } from './cashflow.js';
+import { sensitivityAnalysis, goalSeekMargin, SENSITIVITY_GRID } from './analysis.js';
 import { validateProject } from '../domain/validation.js';
 import { DemoProjectRepository } from '../data/demo/demoRepository.js';
 import type { ProjectInput } from './types.js';
@@ -24,6 +25,14 @@ const base: ProjectInput = {
   financingCost: 100000,
   costCompleteness: 'complete',
   sourceAsOf: '2026-09-10',
+};
+
+const incomplete: ProjectInput = {
+  ...base,
+  id: 't-2',
+  buildCost: null,
+  costCompleteness: 'incomplete',
+  missingFields: ['buildCost'],
 };
 
 describe('cashflow (provisional linear distribution)', () => {
@@ -69,13 +78,6 @@ describe('evaluation', () => {
   });
 
   it('blocks incomplete projects without fabricating results', () => {
-    const incomplete: ProjectInput = {
-      ...base,
-      id: 't-2',
-      buildCost: null,
-      costCompleteness: 'incomplete',
-      missingFields: ['buildCost'],
-    };
     const r = evaluate(incomplete);
     expect(r.status).toBe('validation-exception');
     expect(r.results).toBeNull();
@@ -111,22 +113,65 @@ describe('evaluation', () => {
   });
 
   it('keeps scenarios on incomplete projects as validation exceptions', () => {
-    const incomplete: ProjectInput = {
-      ...base,
-      buildCost: null,
-      costCompleteness: 'incomplete',
-      missingFields: ['buildCost'],
-    };
     const r = evaluate(
       applyScenarioDelta(incomplete, {
         id: 's-2',
-        projectId: 't-1',
+        projectId: 't-2',
         name: 'stress',
         changes: { buildCostPct: 15 },
       }),
     );
     expect(r.status).toBe('validation-exception');
     expect(r.results).toBeNull();
+  });
+});
+
+describe('sensitivity analysis (provisional, one-way)', () => {
+  it('produces one row per driver and grid step', () => {
+    const r = sensitivityAnalysis(base);
+    expect(r.status).toBe('ok');
+    if (r.status === 'ok') {
+      const expected = Object.values(SENSITIVITY_GRID).reduce((a, steps) => a + steps.length, 0);
+      expect(r.rows).toHaveLength(expected);
+      expect(r.rows.every((row) => Number.isFinite(row.marginPct) && Number.isFinite(row.npv))).toBe(true);
+    }
+  });
+
+  it('moves margin in the expected direction', () => {
+    const r = sensitivityAnalysis(base);
+    if (r.status === 'ok') {
+      const up = r.rows.find((row) => row.driver === 'revenuePct' && row.change === 10);
+      const down = r.rows.find((row) => row.driver === 'revenuePct' && row.change === -10);
+      expect(up!.marginPct).toBeGreaterThan(down!.marginPct);
+    }
+  });
+
+  it('returns validation-exception for incomplete projects', () => {
+    const r = sensitivityAnalysis(incomplete);
+    expect(r.status).toBe('validation-exception');
+    if (r.status === 'validation-exception') {
+      expect(r.rows).toBeNull();
+    }
+  });
+});
+
+describe('margin goal-seek (provisional, informational)', () => {
+  it('solves the revenue that meets the target margin at current costs', () => {
+    const r = goalSeekMargin(base);
+    expect(r.status).toBe('ok');
+    if (r.status === 'ok' && r.feasible) {
+      expect(r.targetMarginPct).toBe(15);
+      const cost = 1700000;
+      const expectedRevenue = cost / (1 - 0.15);
+      expect(r.requiredRevenue).toBeCloseTo(Math.round(expectedRevenue));
+      const marginAtSolution = ((r.requiredRevenue - cost) / r.requiredRevenue) * 100;
+      expect(marginAtSolution).toBeCloseTo(15, 1);
+    }
+  });
+
+  it('returns validation-exception for incomplete projects', () => {
+    const r = goalSeekMargin(incomplete);
+    expect(r.status).toBe('validation-exception');
   });
 });
 
@@ -137,7 +182,7 @@ describe('validation', () => {
 });
 
 describe('tenant isolation (demo repository)', () => {
-  it('returns only the requested tenant\'s projects', async () => {
+  it('returns only projects of the requested tenant', async () => {
     const repo = new DemoProjectRepository();
     const nw = await repo.listProjects('northwind-dev');
     const co = await repo.listProjects('contoso-sandbox');

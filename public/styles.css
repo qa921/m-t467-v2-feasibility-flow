@@ -1,0 +1,75 @@
+:root {
+  --ink: #1c2333;
+  --muted: #667085;
+  --line: #d8dee9;
+  --accent: #2f6fed;
+  --warn-bg: #fff4e5;
+  --warn-ink: #8a4b00;
+  --exc-bg: #fdecec;
+  --exc-ink: #9b1c1c;
+  --demo-bg: #fff8d6;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--ink);
+  background: #fafbfd;
+}
+
+header { padding: 16px 24px 0; }
+.title-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; flex-wrap: wrap; }
+h1 { font-size: 20px; margin: 0; }
+h2 { font-size: 18px; margin: 20px 0 10px; }
+h3 { font-size: 15px; margin: 18px 0 8px; }
+
+.tenant-box { border: 1px dashed var(--warn-ink); background: var(--warn-bg); padding: 10px 14px; border-radius: 8px; max-width: 340px; }
+.tenant-box label { font-weight: 600; font-size: 13px; display: block; margin-bottom: 6px; }
+.tenant-box select { width: 100%; padding: 6px; }
+
+.badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; vertical-align: middle; }
+.badge.demo { background: #ffe45c; color: #5c4a00; border: 1px solid #d9b800; }
+.badge.sim { background: var(--warn-bg); color: var(--warn-ink); border: 1px solid var(--warn-ink); }
+.badge.bad { background: var(--exc-bg); color: var(--exc-ink); border: 1px solid var(--exc-ink); }
+.badge.ok { background: #e7f6ec; color: #146c2e; border: 1px solid #146c2e; }
+
+.banner { margin: 12px 24px 0; padding: 10px 14px; border-radius: 8px; background: var(--demo-bg); border: 1px solid #d9b800; font-size: 13px; }
+.banner code { background: rgba(0,0,0,.06); padding: 1px 5px; border-radius: 4px; }
+
+.meta-bar { margin: 10px 24px 0; padding: 8px 14px; border-radius: 8px; background: #eef2fb; border: 1px solid var(--line); font-size: 12.5px; display: flex; gap: 18px; flex-wrap: wrap; }
+.meta-bar.hidden { display: none; }
+
+.steps { display: flex; gap: 8px; padding: 14px 24px 0; flex-wrap: wrap; }
+.steps button { padding: 8px 14px; border: 1px solid var(--line); background: #fff; border-radius: 8px; cursor: pointer; font-size: 13.5px; }
+.steps button.active { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+
+main { padding: 4px 24px 32px; max-width: 1080px; }
+
+table { border-collapse: collapse; width: 100%; margin: 8px 0; background: #fff; }
+.grid th, .grid td { border: 1px solid var(--line); padding: 6px 10px; font-size: 13px; text-align: left; }
+.grid th { background: #f2f4f9; }
+.kv td { border: 1px solid var(--line); padding: 6px 10px; font-size: 13.5px; }
+.kv td:first-child { background: #f2f4f9; width: 240px; font-weight: 600; }
+tr.missing td { background: var(--exc-bg); }
+
+button { padding: 6px 12px; border: 1px solid var(--accent); background: #fff; color: var(--accent); border-radius: 6px; cursor: pointer; }
+button:disabled { border-color: var(--line); color: var(--muted); cursor: not-allowed; }
+
+.notice { background: var(--warn-bg); border: 1px solid var(--warn-ink); color: var(--warn-ink); padding: 10px 14px; border-radius: 8px; margin: 10px 0; font-size: 13.5px; }
+.exception { background: var(--exc-bg); border: 1px solid var(--exc-ink); color: var(--exc-ink); padding: 12px 16px; border-radius: 8px; margin: 10px 0; font-size: 13.5px; }
+.exception ul { margin: 8px 0 0; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; margin: 10px 0; }
+.card { border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; background: #fff; }
+.card h3 { margin-top: 0; }
+.changes { margin: 0 0 10px; padding-left: 18px; font-size: 13px; color: var(--muted); }
+
+.fine { font-size: 12px; color: var(--muted); }
+footer { padding: 16px 24px 32px; border-top: 1px solid var(--line); }
+
+.report { position: relative; border: 1px solid var(--line); border-radius: 10px; padding: 18px 22px; background: #fff; margin-top: 12px; }
+.watermark { display: inline-block; background: #ffe45c; color: #5c4a00; font-weight: 800; font-size: 12px; letter-spacing: .04em; padding: 4px 10px; border-radius: 6px; border: 1px solid #d9b800; margin-bottom: 8px; }
+
+details { margin: 10px 0; font-size: 13px; }
+summary { cursor: pointer; font-weight: 600; }

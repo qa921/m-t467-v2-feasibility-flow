@@ -10,6 +10,7 @@ import {
   PROVISIONAL_ASSUMPTIONS,
   ASSUMPTION_SET_VERSION,
 } from '../engine/engine.js';
+import { sensitivityAnalysis, goalSeekMargin } from '../engine/analysis.js';
 import { DISPLAY_CONVENTIONS } from '../domain/conventions.js';
 
 /** Selects the persistence implementation. Default: demo fixtures. */
@@ -24,8 +25,9 @@ export function createApp(repo: ProjectRepository = createRepository()) {
   const app = express();
   app.use(express.json());
 
-  // Demo tenancy model: the tenant is carried by the x-tenant-id header and
-  // every repository call is scoped by it. There is no auth in this demo.
+  // SIMULATED tenancy for the demo: the tenant is carried by the x-tenant-id
+  // header and every repository call is scoped by it. This is NOT
+  // authentication — there is no login while persistence/auth are pending.
   app.use('/api', (req, res, next) => {
     const open = ['/tenants', '/assumptions', '/conventions'];
     const tenantId = req.header('x-tenant-id');
@@ -94,6 +96,24 @@ export function createApp(repo: ProjectRepository = createRepository()) {
     res.json(evaluateScenario(project, delta));
   });
 
+  app.get('/api/projects/:id/sensitivity', async (req, res) => {
+    const project = await repo.getProject(res.locals.tenantId, req.params.id);
+    if (!project) {
+      res.status(404).json({ error: 'Project not found for this tenant' });
+      return;
+    }
+    res.json(sensitivityAnalysis(project));
+  });
+
+  app.get('/api/projects/:id/goal-seek', async (req, res) => {
+    const project = await repo.getProject(res.locals.tenantId, req.params.id);
+    if (!project) {
+      res.status(404).json({ error: 'Project not found for this tenant' });
+      return;
+    }
+    res.json(goalSeekMargin(project));
+  });
+
   app.get('/api/projects/:id/report', async (req, res) => {
     const project = await repo.getProject(res.locals.tenantId, req.params.id);
     if (!project) {
@@ -108,6 +128,8 @@ export function createApp(repo: ProjectRepository = createRepository()) {
       project: { id: project.id, name: project.name, tenantId: project.tenantId },
       baseline: evaluate(project),
       scenarios: scenarios.map((s) => ({ scenario: s, evaluation: evaluateScenario(project, s) })),
+      sensitivity: sensitivityAnalysis(project),
+      goalSeek: goalSeekMargin(project),
       affordability: {
         status: 'pending-specification',
         note: 'No approved affordability formula exists; affordability is not computed (assumption AFFORDABILITY-PENDING).',

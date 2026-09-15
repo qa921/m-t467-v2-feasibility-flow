@@ -6,8 +6,14 @@
  * none of these are approved rules. Each assumption is versioned via
  * ASSUMPTION_SET_VERSION, surfaced in the app banner and embedded in every
  * report, and is individually replaceable once an approved specification lands.
+ *
+ * Changelog:
+ *   provisional-2026-09-15.v1 — initial set (distribution, rate conversion,
+ *                               IRR, margin display, affordability pending).
+ *   provisional-2026-09-15.v2 — adds SENSITIVITY-ONE-WAY and GOAL-SEEK-INFO-ONLY
+ *                               for the provisional analysis features.
  */
-export const ASSUMPTION_SET_VERSION = 'provisional-2026-09-15.v1';
+export const ASSUMPTION_SET_VERSION = 'provisional-2026-09-15.v2';
 
 export interface Assumption {
   id: string;
@@ -56,6 +62,22 @@ export const PROVISIONAL_ASSUMPTIONS: readonly Assumption[] = [
       'No affordability formula exists in any available source, so affordability is reported as "pending specification" and is NOT computed.',
     replacementPath:
       'Implement affordability in src/engine/engine.ts only after an approved formula is supplied.',
+  },
+  {
+    id: 'SENSITIVITY-ONE-WAY',
+    status: 'PROVISIONAL',
+    summary:
+      'Sensitivity varies one driver at a time (revenue, build cost, discount rate) over a fixed grid while holding the others constant. Exploratory analysis, not an approved stress-testing standard.',
+    replacementPath:
+      'Replace SENSITIVITY_GRID / sensitivityAnalysis() in src/engine/analysis.ts if an approved sensitivity protocol is defined.',
+  },
+  {
+    id: 'GOAL-SEEK-INFO-ONLY',
+    status: 'PROVISIONAL',
+    summary:
+      'Margin goal-seek algebraically solves for the revenue that would meet marginTargetPct at current costs. Informational only: the target is not an approved threshold and the result is not a recommendation.',
+    replacementPath:
+      'Replace goalSeekMargin() in src/engine/analysis.ts if an approved goal-seek definition (driver, constraints) is supplied.',
   },
 ];
 

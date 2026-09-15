@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>M-T467-V2 — Feasibility (DEMO)</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <div class="title-row">
+      <h1>Feasibility flow <span class="badge demo">DEMO DATA</span></h1>
+      <div class="tenant-box">
+        <label for="tenantSelect">
+          Tenant context
+          <span class="badge sim">SIMULATED — no login, not authentication</span>
+        </label>
+        <select id="tenantSelect"></select>
+        <p class="fine">Stand-in for tenancy while there is no login and no dedicated Neon database.</p>
+      </div>
+    </div>
+  </header>
+
+  <div id="assumptionBanner" class="banner"></div>
+  <div id="metaBar" class="meta-bar hidden"></div>
+
+  <nav id="steps" class="steps">
+    <button data-step="project" class="active">1 · Project</button>
+    <button data-step="inputs">2 · Inputs</button>
+    <button data-step="baseline">3 · Baseline</button>
+    <button data-step="scenarios">4 · Scenarios &amp; sensitivity</button>
+    <button data-step="report">5 · Report</button>
+  </nav>
+
+  <main id="view"></main>
+
+  <footer class="fine">
+    M-T467-V2 · All figures computed from DEMO fixture data under PROVISIONAL assumptions (not approved rules).
+    Incomplete cost inputs surface as validation exceptions — nothing is fabricated or repaired.
+  </footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
