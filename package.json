@@ -1,0 +1,24 @@
+{
+  "name": "m-t467-v2-feasibility-flow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "M-T467-V2 feasibility app: single tenant-scoped flow Project -> Inputs -> Baseline -> Scenarios/Sensitivity -> Report. Financial engine isolated and testable. All calculation assumptions are PROVISIONAL, not approved rules.",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "dev": "tsx watch src/server/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server/index.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.5.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}
